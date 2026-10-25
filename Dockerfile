@@ -1,13 +1,12 @@
 # 1. Abhängigkeiten installieren
-FROM node:18-alpine AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:24-alpine AS deps
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 RUN npm ci
 
 # 2. Projekt bauen (Build-Schritt)
-FROM node:18-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -18,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
 
 # 3. Produktions-Image erstellen (Nur das Notwendigste wird kopiert)
-FROM node:18-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
